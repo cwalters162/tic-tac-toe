@@ -21,38 +21,51 @@ enum GameState {
   PLAYING,
   DRAW,
   WIN,
-  LOSS,
 }
 
 function App() {
   const [gameBoard, setGameBoard] = useState(initialGameBoardState);
-  const [turn, setTurn] = useState<Player>(Player.X)
   const [gameState, setGameState] = useState<GameState>(GameState.PLAYING)
+  const [turn, setTurn] = useState<Player>(Player.X)
   const [prompt, setPrompt] = useState("")
 
+  function checkForThreeInARow(tileType: TileType) {
+    for (let i = 0; i < 3; i++) {
+      if (gameBoard[i][0] === tileType && gameBoard[i][1] === tileType && gameBoard[i][2] === tileType) {
+        return true
+      }
+      if (gameBoard[0][i] === tileType && gameBoard[1][i] === tileType && gameBoard[2][i] === tileType) {
+        return true
+      }
+    }
+
+    if (gameBoard[0][0] === tileType && gameBoard[1][1] === tileType && gameBoard[2][2] === tileType) {
+      return true
+    }
+
+    return gameBoard[0][2] === tileType && gameBoard[1][1] === tileType && gameBoard[2][0] === tileType;
+  }
+
   function checkWin() {
-    for (let i = 0; i < 3; i++) {
-      if (gameBoard[i][0] == TileType.X && gameBoard[i][1] == TileType.X && gameBoard[i][2] == TileType.X) {
-        setGameState(GameState.WIN)
-        setPrompt(`Player fillme won!`)
-      }
-    }
-
-    for (let i = 0; i < 3; i++) {
-      if (gameBoard[0][i] == TileType.X && gameBoard[1][i] == TileType.X && gameBoard[2][i] == TileType.X) {
-        setGameState(GameState.WIN)
-        setPrompt(`Player fillme won!`)
-      }
-    }
-
-    if (gameBoard[0][0] == TileType.X && gameBoard[1][1] == TileType.X && gameBoard[2][2] == TileType.X) {
+    if (checkForThreeInARow(TileType.X)) {
       setGameState(GameState.WIN)
-      setPrompt(`Player fillme won!`)
+      setPrompt(`Player X won!`)
+    }
+    if (checkForThreeInARow(TileType.O)) {
+      setGameState(GameState.WIN)
+      setPrompt(`Player O won!`)
     }
 
-    if (gameBoard[0][2] == TileType.X && gameBoard[1][1] == TileType.X && gameBoard[2][0] == TileType.X) {
-      setGameState(GameState.WIN)
-      setPrompt(`Player fillme won!`)
+
+    const emptyTiles = gameBoard.flatMap((row) => {
+        return row.filter((tile)=> {
+          return tile == TileType.Empty;
+        })
+      })
+
+    if (emptyTiles.length === 0) {
+      setGameState(GameState.DRAW);
+      setPrompt("Draw!")
     }
   }
 
@@ -61,6 +74,7 @@ function App() {
   }
 
   function claimTile(turn: Player, x: number, y: number) {
+    setPrompt("")
     switch (turn) {
       case Player.X: {
         const newGameBoard = gameBoard
@@ -68,7 +82,6 @@ function App() {
         setGameBoard(newGameBoard);
         checkWin()
         setTurn(Player.O)
-        setPrompt("")
         break;
       }
       case Player.O: {
@@ -77,13 +90,28 @@ function App() {
         setGameBoard(newGameBoard);
         checkWin()
         setTurn(Player.X)
-        setPrompt("")
         break;
       }
     }
   }
 
+  function resetGame() {
+    const board = [
+      [TileType.Empty, TileType.Empty, TileType.Empty],
+      [TileType.Empty, TileType.Empty, TileType.Empty],
+      [TileType.Empty, TileType.Empty, TileType.Empty],
+    ]
+    setPrompt("");
+    setGameState(GameState.PLAYING);
+    setGameBoard(board);
+    setTurn(Player.X);
+  }
+
   function handleOnClick(x: number, y: number) {
+    if (gameState != GameState.PLAYING) {
+      return
+    }
+
     switch (gameBoard[x][y]) {
       case TileType.Empty: {
         claimTile(turn, x, y)
@@ -98,16 +126,6 @@ function App() {
         break;
       }
     }
-  }
-
-  if (gameState == GameState.WIN) {
-    return (
-        <div className={"flex flex-col justify-center items-center w-screen h-screen bg-black text-custom-text"}>
-          <span>Congratulations you won!</span>
-          <span>Play again?</span>
-          <button className={"border-2 border"}>Yes!</button>
-        </div>
-    )
   }
 
   return (
@@ -129,6 +147,11 @@ function App() {
           <Tile display={gameBoard[2][2]} handleOnClick={() => handleOnClick(2, 2)}/>
         </div>
         <span className={"pt-5 text-2xl min-h-[4rem] text-custom-text"}>{prompt}</span>
+        {!(gameState === GameState.PLAYING) ?
+            <button className={"border-custom-border border-2 text-custom-text px-2 text-2xl bg-custom-primary hover:bg-custom-highlight rounded-lg"} onClick={resetGame}>Play Again?</button>
+            :
+            <div className={"min-h-[2.3rem]"}/>
+        }
       </div>
   )
 }
