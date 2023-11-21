@@ -31,7 +31,26 @@ function App() {
   const [prompt, setPrompt] = useState("")
 
   function checkWin() {
-    if (gameBoard[0][0] == TileType.X && gameBoard[0][1] == TileType.X && gameBoard[0][2] == TileType.X) {
+    for (let i = 0; i < 3; i++) {
+      if (gameBoard[i][0] == TileType.X && gameBoard[i][1] == TileType.X && gameBoard[i][2] == TileType.X) {
+        setGameState(GameState.WIN)
+        setPrompt(`Player fillme won!`)
+      }
+    }
+
+    for (let i = 0; i < 3; i++) {
+      if (gameBoard[0][i] == TileType.X && gameBoard[1][i] == TileType.X && gameBoard[2][i] == TileType.X) {
+        setGameState(GameState.WIN)
+        setPrompt(`Player fillme won!`)
+      }
+    }
+
+    if (gameBoard[0][0] == TileType.X && gameBoard[1][1] == TileType.X && gameBoard[2][2] == TileType.X) {
+      setGameState(GameState.WIN)
+      setPrompt(`Player fillme won!`)
+    }
+
+    if (gameBoard[0][2] == TileType.X && gameBoard[1][1] == TileType.X && gameBoard[2][0] == TileType.X) {
       setGameState(GameState.WIN)
       setPrompt(`Player fillme won!`)
     }
