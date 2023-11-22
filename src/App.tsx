@@ -47,23 +47,18 @@ function App() {
   }
 
   function checkWin() {
+    const emptyTiles = gameBoard.flatMap((row) => {
+      return row.filter((tile)=> {
+        return tile == TileType.Empty;
+      })
+    })
     if (checkForThreeInARow(TileType.X)) {
       setGameState(GameState.WIN)
       setPrompt(`Player X won!`)
-    }
-    if (checkForThreeInARow(TileType.O)) {
+    } else if (checkForThreeInARow(TileType.O)) {
       setGameState(GameState.WIN)
       setPrompt(`Player O won!`)
-    }
-
-
-    const emptyTiles = gameBoard.flatMap((row) => {
-        return row.filter((tile)=> {
-          return tile == TileType.Empty;
-        })
-      })
-
-    if (emptyTiles.length === 0) {
+    } else if (emptyTiles.length === 0) {
       setGameState(GameState.DRAW);
       setPrompt("Draw!")
     }
@@ -130,7 +125,7 @@ function App() {
 
   return (
       <div className={"flex flex-col justify-center items-center w-screen h-screen bg-custom-bg"}>
-        <span className={"text-5xl pb-5 text-custom-text"}>Current Player: {turn}</span>
+        <span className={"text-3xl sm:text-5xl pb-5 text-custom-text"}>Current Player: {turn}</span>
         <div className={"flex justify-center border-y-2 border-custom-border"}>
           <Tile display={gameBoard[0][0]} handleOnClick={() => handleOnClick(0, 0)}/>
           <Tile display={gameBoard[0][1]} handleOnClick={() => handleOnClick(0, 1)}/>
@@ -163,7 +158,7 @@ interface TileProps {
 function Tile({display, handleOnClick}: TileProps) {
   return (
       <div
-          className={"min-w-[9rem] min-h-[9rem] text-9xl flex justify-center items-center bg-custom-primary border-custom-border first:border-l-2 border-r-2 hover:bg-custom-highlight text-custom-text"}
+          className={" min-h-[5rem] min-w-[5rem] sm:min-w-[9rem] sm:min-h-[9rem] text-5xl sm:text-9xl flex justify-center items-center bg-custom-primary border-custom-border first:border-l-2 border-r-2 hover:bg-custom-highlight text-custom-text"}
           onClick={() => handleOnClick()}>
         {display}
       </div>
