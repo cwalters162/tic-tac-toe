@@ -1,10 +1,16 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { SocketContext } from "../contexts/SocketContext.tsx";
 
 export default function RemoteGame() {
+  const ws = useContext(SocketContext);
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:162");
-    ws.addEventListener("open", () => {
-      console.log("Connected to server.");
+    ws.addEventListener("message", (e) => {
+      let data = JSON.parse(e.data);
+      switch (data.command) {
+        case "update_game_list": {
+          console.log("Server has sent a game list");
+        }
+      }
     });
     return () => {
       ws.close();
