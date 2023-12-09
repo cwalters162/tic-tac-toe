@@ -4,10 +4,12 @@ import { SocketContext } from "../contexts/SocketContext.tsx";
 export default function RemoteGame() {
   const ws = useContext(SocketContext);
   useEffect(() => {
+    ws.send(JSON.stringify({ command: "get_game_list", payload: null }));
     ws.addEventListener("message", (e) => {
       let data = JSON.parse(e.data);
+      console.log("You got a message");
       switch (data.command) {
-        case "update_game_list": {
+        case "get_game_list": {
           console.log("Server has sent a game list");
         }
       }
