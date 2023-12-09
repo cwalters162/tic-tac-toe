@@ -2,7 +2,8 @@ name: Deploy static content to Pages
 
 on:
   push:
-    branches: ['main']
+    tags:
+      - '^v[0-9]+\.[0-9]+\.[0-9]+'
   workflow_dispatch:
 
 permissions:
@@ -28,6 +29,8 @@ jobs:
         with:
           node-version: 18
           cache: 'npm'
+      - name: Move into frontend directory
+        run: cd frontend
       - name: Install dependencies
         run: npm install
       - name: Build
