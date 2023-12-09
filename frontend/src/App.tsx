@@ -1,5 +1,6 @@
 import LocalGame from "./components/LocalGame.tsx";
 import { useState } from "react";
+import RemoteGame from "./components/RemoteGame.tsx";
 
 enum GameOption {
   PENDING,
@@ -53,7 +54,7 @@ function App() {
     case GameOption.LOCAL:
       return <LocalGame />;
     case GameOption.REMOTE:
-      return <div>TO BE DEVELOPED</div>;
+      return <RemoteGame />;
   }
 }
 
