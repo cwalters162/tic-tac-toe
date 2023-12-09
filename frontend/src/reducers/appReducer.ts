@@ -15,7 +15,7 @@ export enum GameStatus {
   WIN,
 }
 
-export interface AppState {
+export interface LocalGameState {
   gameBoard: TileType[][];
   gameStatus: GameStatus;
   turn: Player;
@@ -33,7 +33,7 @@ export enum Command {
   Reset = "reset",
 }
 
-export function reducer(state: AppState, action: Action) {
+export function reducer(state: LocalGameState, action: Action) {
   const { turn } = state;
 
   switch (action.command) {
@@ -49,7 +49,7 @@ export function reducer(state: AppState, action: Action) {
     }
   }
 
-  function checkForThreeInARow(tileType: TileType, checkState: AppState) {
+  function checkForThreeInARow(tileType: TileType, checkState: LocalGameState) {
     for (let i = 0; i < 3; i++) {
       if (
         checkState.gameBoard[i][0] === tileType &&
@@ -82,7 +82,7 @@ export function reducer(state: AppState, action: Action) {
     );
   }
 
-  function checkWin(checkState: AppState) {
+  function checkWin(checkState: LocalGameState) {
     const emptyTiles = checkState.gameBoard.flatMap((row) => {
       return row.filter((tile) => {
         return tile == TileType.Empty;

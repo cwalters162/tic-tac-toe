@@ -1,6 +1,6 @@
 import { useReducer } from "react";
 import {
-  AppState,
+  LocalGameState,
   Command,
   GameStatus,
   Player,
@@ -15,7 +15,7 @@ const initialGameBoardState = [
   [TileType.Empty, TileType.Empty, TileType.Empty],
 ];
 
-const initialState: AppState = {
+const initialState: LocalGameState = {
   gameBoard: initialGameBoardState,
   gameStatus: GameStatus.PLAYING,
   prompt: "",
