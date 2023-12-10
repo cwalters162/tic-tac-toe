@@ -30,8 +30,8 @@ const connections: Record<string, WebSocket> = {};
 const games: Record<string, Game> = {}
 
 wss.on('connection', (ws: WebSocket) => {
-    console.log('New client connected');
-    console.log('Generating UUID and sending it to the client');
+
+    console.log('New client connected - generating UUID and sending it to the client');
     let uuid: string = crypto.randomUUID();
     connections[uuid] = ws
 
@@ -53,20 +53,20 @@ wss.on('connection', (ws: WebSocket) => {
 
     ws.on('close', () => {
         console.log('Client disconnected');
-        delete connections[uuid]
+        clean(uuid)
     });
 });
 
 function handleMessage(message: Message, uuid: string, ws: WebSocket) {
     switch (message.command) {
         case Command.get_game_list: {
-            console.log('sending current game list')
+            console.log('Sending current game list')
             ws.send(JSON.stringify({command: Command.update_game_list, payload: Object.keys(games)}))
             break;
         }
         case Command.create_game: {
             const gameId = crypto.randomUUID()
-            console.log(`User: ${uuid} creating game ${gameId}.`)
+            console.log(`User: ${uuid} created game ${gameId}.`)
             games[gameId] = new Game(gameId);
             games[gameId].addClient(uuid);
             ws.send(JSON.stringify({command: "update_game", payload: games[gameId]}))
@@ -101,8 +101,6 @@ function handleMessage(message: Message, uuid: string, ws: WebSocket) {
                     break;
                 }
             }
-
-
             break;
         }
         case Command.reset_game: {
@@ -113,6 +111,31 @@ function handleMessage(message: Message, uuid: string, ws: WebSocket) {
                 clientWS.send(JSON.stringify({command: Command.update_game, payload: games[gameId]}))
             }
             break;
+        }
+    }
+}
+
+function clean(uuid: string) {
+    console.log(`Cleaning client: ${uuid}`)
+    delete connections[uuid]
+
+    for (const gameId in games) {
+        let game = games[gameId];
+        if (game.clients[uuid] == null) {
+            return
+        }
+        console.log(`Removing client: ${uuid} from game: ${JSON.stringify(game.id)}`)
+        game.removeClient(uuid)
+        console.log(`Client removed. Remaining clients in game: ${JSON.stringify(Object.values(game.clients))}`)
+        for (const client in game.clients) {
+            console.log(`Connections:${JSON.stringify(Object.keys(connections))}`)
+            let clientWS = connections[client]
+            if (clientWS == null) {
+                console.log(`client ${client} websocket not found...skipping`)
+                continue
+            }
+            console.log(`Updating game for client: ${client}`)
+            clientWS.send(JSON.stringify({ command: Command.update_game, payload: game }))
         }
     }
 }

@@ -37,7 +37,7 @@ export class Game implements IGame {
 
         if (this.board[x][y] !== TileType.Empty) {
             this.prompt = "Please select an unclaimed tile"
-            return Command.update_game
+            return Command.not_your_turn
         }
 
         switch (player_type) {
@@ -57,19 +57,31 @@ export class Game implements IGame {
     }
 
     addClient(clientId: string) {
-        switch (Object.keys(this.clients).length) {
-            case 0: {
-                this.clients[clientId] = Player.X;
-                return;
+        if (Object.keys(this.clients).length == 2) {
+            return
+        }
+            let hasX = false;
+            let hasO = false;
+            for (const playerType of Object.values(this.clients)) {
+                if (playerType == Player.X) {
+                    hasX = true
+                } else if (playerType == Player.O) {
+                    hasO = true
+                }
             }
-            case 1: {
-                this.clients[clientId] = Player.O;
-                return;
-            }
-            default: {
+
+            if (hasX && !hasO) {
+                this.clients[clientId] = Player.O
+                return
+            } else if (hasO && !hasX) {
+                this.clients[clientId] = Player.X
+                return
+            } else if (hasX && hasO) {
+                return
+            } else {
+                this.clients[clientId] = Player.X
                 return
             }
-        }
     }
 
     checkWin() {
@@ -132,6 +144,7 @@ export class Game implements IGame {
 
 
     removeClient(clientId: string) {
+        this.prompt = `Player ${clientId} has left the game`;
         delete this.clients[clientId]
     }
 
